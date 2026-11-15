@@ -1,0 +1,32 @@
+name: weather_pe
+version: "1.0.0"
+config-version: 2
+profile: weather_pe
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  weather_pe:
+    staging:
+      +materialized: view
+      +schema: staging
+    marts:
+      +materialized: table
+      +schema: marts
+
+seeds:
+  weather_pe:
+    +schema: seeds
+    cities:
+      +column_types:
+        city_id: integer
+        latitude: double
+        longitude: double
+    weather_codes:
+      +column_types:
+        weather_code: integer

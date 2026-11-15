@@ -1,0 +1,64 @@
+version: 2
+
+models:
+  - name: dim_city
+    description: Dimensión ciudad con cobertura de datos.
+    columns:
+      - name: city_id
+        data_tests: [unique, not_null]
+
+  - name: dim_date
+    description: Dimensión calendario (incluye estación del hemisferio sur).
+    columns:
+      - name: date_day
+        data_tests: [unique, not_null]
+      - name: season
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['Verano', 'Otoño', 'Invierno', 'Primavera']
+
+  - name: fct_weather_daily
+    description: Hecho diario de clima por ciudad (modelo incremental).
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: [city_id, weather_date]
+    columns:
+      - name: city_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_city')
+                field: city_id
+      - name: weather_date
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_day
+      - name: heat_category
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['Muy caluroso', 'Caluroso', 'Templado', 'Fresco', 'Frío']
+      - name: precipitation_mm
+        data_tests: [non_negative]
+
+  - name: mart_city_monthly
+    description: Resumen mensual por ciudad (temperatura, lluvia, días extremos).
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: [city, year_month]
+
+  - name: mart_extreme_events
+    description: Eventos climáticos extremos detectados.
+
+  - name: mart_city_kpis
+    description: KPIs por ciudad de los últimos 30 días y anomalía térmica vs. histórico.
+    columns:
+      - name: city
+        data_tests: [unique, not_null]

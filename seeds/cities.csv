@@ -1,0 +1,13 @@
+city_id,city,department,natural_region,latitude,longitude
+1,Lima,Lima,Costa,-12.0464,-77.0428
+2,Arequipa,Arequipa,Sierra,-16.4090,-71.5375
+3,Trujillo,La Libertad,Costa,-8.1116,-79.0288
+4,Chiclayo,Lambayeque,Costa,-6.7714,-79.8409
+5,Piura,Piura,Costa,-5.1945,-80.6328
+6,Cusco,Cusco,Sierra,-13.5319,-71.9675
+7,Huancayo,Junín,Sierra,-12.0651,-75.2049
+8,Iquitos,Loreto,Selva,-3.7491,-73.2538
+9,Tacna,Tacna,Costa,-18.0146,-70.2536
+10,Puno,Puno,Sierra,-15.8402,-70.0219
+11,Pucallpa,Ucayali,Selva,-8.3791,-74.5539
+12,Cajamarca,Cajamarca,Sierra,-7.1638,-78.5003

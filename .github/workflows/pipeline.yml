@@ -1,0 +1,71 @@
+name: Data Engineering Pipeline (ELT + dbt + Pages)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Ejecución diaria automática a las 06:00 UTC (01:00 hora Perú)
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-pipeline-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  pipeline:
+    name: Extract · Load · dbt Build · Publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Pruebas unitarias de la ingesta (pytest)
+        run: pytest tests_py -v
+
+      - name: Restaurar caché del warehouse DuckDB (carga incremental)
+        uses: actions/cache@v4
+        with:
+          path: warehouse
+          key: duckdb-warehouse-${{ github.run_id }}
+          restore-keys: |
+            duckdb-warehouse-
+
+      - name: Ejecutar pipeline completo (Extract → dbt seed/build/test/docs → site)
+        env:
+          DBT_PROFILES_DIR: .
+          REPO_URL: https://github.com/${{ github.repository }}
+        run: python -m pipeline.run
+
+      - name: Subir artefacto para GitHub Pages
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    name: Publicar en GitHub Pages
+    needs: pipeline
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

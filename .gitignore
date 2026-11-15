@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+target/
+dbt_packages/
+logs/
+warehouse/
+site/
+*.duckdb
+*.duckdb.wal
+.env
+entrega/*.zip
