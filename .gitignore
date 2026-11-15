@@ -11,3 +11,5 @@ site/
 *.duckdb.wal
 .env
 entrega/*.zip
+
+.user.yml
